@@ -44,20 +44,24 @@ Welcome to the Task Athlete TUI (Text-based User Interface)! This application pr
 
 ## Installation
 
-(Instructions on how to install `ta` and its TUI component would go here. This might involve:
-*   Downloading a pre-compiled binary from a releases page.
-*   Using a package manager (e.g., `brew install ta`, `apt-get install ta`).
-*   Building from source: `git clone <repository-url>` and then `cargo build --release` if it's a Rust project.)
+### Nix
+1.   First you will need to clone this repo and the repo for the [library](https://github.com/Vilhelm-Ian/TaskAthlete) in the same directory. 
+2.   Add the following commands to home-manager.nix ```nix
+  let
+     task-athlete-lib = pkgs.callPackage "${directory_to_library}/default.nix" {};
+     task-athlete-tui = (pkgs.callPackage "${directory_to_tui}/default.nix" {inherit task-athlete-lib;}).overrideAttrs (oldAttrs: {
+        postUnpack = ''
+          mkdir -p $sourceRoot/../
+          ln -s ${task-athlete-lib.src} $sourceRoot/../task-athlete-lib
+        '';
+      });
 
-**Example Placeholder:**
-
-To install `task-athlete-tui`, please refer to the [releases page](<link-to-your-releases-page>) for pre-compiled binaries.
-Alternatively, if you have [Rust installed](https://www.rust-lang.org/tools/install), you can build from source:
-```bash
-git clone <your-git-repository-url>
-cd task-athlete # or task-athlete-tui if it's a separate crate
-cargo build --release --bin ta-tui # Assuming the TUI binary is 'ta-tui'
-# The executable will be in target/release/ta-tui
+  in 
+  {
+   home.packages = [
+      task-athlete-tui
+   ]
+  }
 ```
 
 ## Running the TUI
